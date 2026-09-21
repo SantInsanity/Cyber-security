@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybersecurity!</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        pre code {
+            font-family: 'Fira Code', 'Courier New', Courier, monospace;
+        }
+        /* Custom smooth scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.4);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.7);
+        }
+    </style>
+</head>
+<body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
+
+    <!-- Top Navigation Header -->
+    <header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+        <div class="flex items-center gap-3">
+            <button id="mobileMenuBtn" class="lg:hidden text-slate-600 dark:text-slate-300 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+                <i class="fa-solid fa-bars text-lg"></i>
+            </button>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                    <i class="fa-solid fa-terminal text-sm"></i>
+                </div>
+                <span class="font-bold text-lg tracking-tight text-slate-900 dark:text-white">SaintVenv! Cybersecurity<span class="text-emerald-600 dark:text-emerald-400">Docs</span></span>
+            </div>
+        </div>
+
+        <!-- Center Quick Search Trigger (for larger screens) -->
+        <div class="hidden md:flex items-center flex-1 max-w-md mx-8">
+            <div class="relative w-full">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-sm"></i>
+                <input type="text" id="headerSearchInput" placeholder="Search commands, topics, keywords..." class="w-full pl-9 pr-4 py-1.5 text-sm bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50 dark:text-white placeholder-slate-400">
+            </div>
+        </div>
+
+        <!-- Header Controls -->
+        <div class="flex items-center gap-2">
+            <button id="addCategoryBtn" class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs md:text-sm font-medium px-3 py-1.5 rounded-lg transition-all border border-slate-200 dark:border-slate-700">
+                <i class="fa-solid fa-folder-plus text-emerald-500"></i>
+                <span class="hidden sm:inline">New Category</span>
+            </button>
+            <button id="addTopicBtn" class="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs md:text-sm font-medium px-3 py-1.5 rounded-lg transition-all shadow-sm">
+                <i class="fa-solid fa-plus"></i>
+                <span class="hidden sm:inline">New Topic</span>
+            </button>
+            
+            <div class="h-5 w-[1px] bg-slate-200 dark:bg-slate-800 mx-1"></div>
+
+            <button id="exportBtn" title="Export Backup JSON" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-sm">
+                <i class="fa-solid fa-download"></i>
+            </button>
+            
+            <label for="importFile" title="Import JSON" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-sm cursor-pointer">
+                <i class="fa-solid fa-upload"></i>
+                <input type="file" id="importFile" accept=".json" class="hidden">
+            </label>
+
+            <button id="resetDataBtn" title="Reset to Default Content" class="p-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg text-sm">
+                <i class="fa-solid fa-rotate-left"></i>
+            </button>
+
+            <button id="themeToggle" title="Toggle Dark/Light Mode" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-sm ml-1">
+                <i class="fa-solid fa-moon dark:hidden"></i>
+                <i class="fa-solid fa-sun hidden dark:block text-amber-400"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Application Layout -->
+    <div class="flex-1 flex overflow-hidden relative">
+
+        <!-- Mobile Sidebar Overlay -->
+        <div id="mobileOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-30 hidden lg:hidden"></div>
+
+        <!-- Left Sidebar Navigation -->
+        <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-80 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+            
+            <!-- Sidebar Search -->
+            <div class="p-3 border-b border-slate-100 dark:border-slate-800/60">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                    <input type="text" id="mobileSearchInput" placeholder="Filter topics or categories..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                </div>
+            </div>
+
+            <!-- Category & Topic Nav List -->
+            <div id="navigationList" class="flex-1 overflow-y-auto p-3 space-y-4">
+                <!-- Navigation Tree Populated Dynamically -->
+            </div>
+
+            <!-- Footer Meta -->
+            <div class="p-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-400 text-center flex justify-between items-center">
+                <span id="topicCount">0 topics loaded</span>
+                <span class="bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 text-[10px] px-1.5 py-0.5 rounded font-mono">Editable Hub</span>
+            </div>
+        </aside>
+
+        <!-- Center Main Content Pane -->
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto w-full">
+            
+            <!-- VIEW MODE DISPLAY -->
+            <div id="viewMode" class="space-y-6">
+                <!-- Content Top Bar -->
+                <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span id="displayCategory" class="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-md border border-emerald-200 dark:border-emerald-800">
+                                Category
+                            </span>
+                        </div>
+                        <h1 id="displayTitle" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-2">
+                            Topic Title
+                        </h1>
+                    </div>
+
+                    <!-- Page Actions -->
+                    <div class="flex items-center gap-2">
+                        <button id="toggleEditBtn" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-slate-700 dark:text-slate-200 transition-colors">
+                            <i class="fa-solid fa-pen-to-square"></i> Edit Page
+                        </button>
+                        <button id="duplicateTopicBtn" title="Duplicate Topic" class="px-3 py-1.5 text-xs font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-slate-700 dark:text-slate-200 transition-colors">
+                            <i class="fa-solid fa-copy"></i>
+                        </button>
+                        <button id="deleteTopicBtn" title="Delete Topic" class="px-3 py-1.5 text-xs font-medium bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 rounded-lg transition-colors">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Markdown/Rendered Body Content -->
+                <div id="displayContent" class="prose dark:prose-invert max-w-none space-y-4">
+                    <!-- Dynamic Body Rendered Here -->
+                </div>
+            </div>
+
+            <!-- EDIT MODE FORM -->
+            <div id="editMode" class="hidden space-y-6 bg-white dark:bg-slate-950 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-emerald-500"></i> Editing Topic
+                    </h2>
+                    <span class="text-xs text-slate-400">Supports HTML tags & code snippets</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Topic Title</label>
+                        <input type="text" id="editTitle" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Category</label>
+                        <input type="text" id="editCategory" list="categoryOptions" placeholder="e.g. Basic Commands" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white">
+                        <datalist id="categoryOptions"></datalist>
+                    </div>
+                </div>
+
+                <!-- Easy Formatting Toolbar -->
+                <div class="flex flex-wrap gap-1 bg-slate-100 dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-800 text-xs">
+                    <button type="button" onclick="insertFormatting('h2')" class="px-2 py-1 bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-slate-700 dark:text-slate-300 font-bold">H2</button>
+                    <button type="button" onclick="insertFormatting('h3')" class="px-2 py-1 bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-slate-700 dark:text-slate-300 font-bold">H3</button>
+                    <button type="button" onclick="insertFormatting('code')" class="px-2 py-1 bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-slate-700 dark:text-slate-300 font-mono">Code Block</button>
+                    <button type="button" onclick="insertFormatting('callout')" class="px-2 py-1 bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-slate-700 dark:text-slate-300">Tip Box</button>
+                    <button type="button" onclick="insertFormatting('bold')" class="px-2 py-1 bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-slate-700 dark:text-slate-300 font-semibold">Bold</button>
+                    <button type="button" onclick="insertFormatting('ul')" class="px-2 py-1 bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-slate-700 dark:text-slate-300"><i class="fa-solid fa-list-ul"></i> List</button>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Content (HTML / Rich Text)</label>
+                    <textarea id="editContent" rows="16" class="w-full p-3 font-mono text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white leading-relaxed"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <button id="cancelEditBtn" class="px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                        Cancel
+                    </button>
+                    <button id="saveEditBtn" class="px-4 py-2 text-xs font-medium bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors shadow-sm">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Sidebar Table of Contents Outline -->
+        <aside class="hidden xl:block w-64 border-l border-slate-200 dark:border-slate-800 p-4 bg-white/50 dark:bg-slate-950/50">
+            <div class="sticky top-20">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
+                    <i class="fa-solid fa-list-ol"></i> On This Page
+                </h3>
+                <ul id="tocList" class="space-y-2 text-xs text-slate-600 dark:text-slate-400 border-l border-slate-200 dark:border-slate-800 pl-3">
+                    <!-- Populated dynamically from page headings -->
+                </ul>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-2.5 rounded-xl shadow-xl text-xs font-medium transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2 z-50">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600"></i>
+        <span id="toastMsg">Action completed</span>
+    </div>
+
+    <script>
+        // Initial Default Cybersecurity & Bash Topics Dataset
+        const DEFAULT_TOPICS = [
+            {
+                id: "bash-nav-basics",
+                category: "1. Navigation & Files",
+                title: "Essential File & Directory Navigation",
+                content: `<p class="text-slate-600 dark:text-slate-300">Navigating the Linux file system quickly and efficiently is the foundational skill required for shell scripting and penetration testing.</p>
+<h2 class="text-xl font-bold text-slate-900 dark:text-white mt-6 mb-3">Core Commands</h2>
+<p class="mb-2 text-sm text-slate-600 dark:text-slate-400">Here are the primary commands for traversing directories:</p>
+<div class="bg-slate-900 text-slate-100 p-4 rounded-xl relative my-3 group">
+    <button onclick="copyCode(this)" class="absolute top-2.5 right-2.5 px-2 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700"><i class="fa-regular fa-copy"></i> Copy</button>
+    <pre><code># Print current working directory
+pwd
+
+# List directory contents with detailed permissions & hidden files
+ls -la
+
+# Change directory
+cd /var/log
+
+# Return to user home directory
+cd ~</code></pre>
+</div>
+<div class="my-4 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border-l-4 border-amber-500 text-amber-900 dark:text-amber-200 text-sm">
+    <strong class="font-bold flex items-center gap-1.5 mb-1"><i class="fa-solid fa-lightbulb"></i> Pro Tip:</strong>
+    Use <code>ls -lh</code> to display file sizes in human-readable formats (e.g., K, M, G).
+</div>`
+            },
+            {
+                id: "text-processing-grep",
+                category: "2. Text Processing",
+                title: "Searching Logs with Grep & Cut",
+                content: `<p class="text-slate-600 dark:text-slate-300">Filtering through log files (like <code>/var/log/auth.log</code>) is crucial for identifying brute-force attempts and anomalous security events.</p>
+<h2 class="text-xl font-bold text-slate-900 dark:text-white mt-6 mb-3">Finding Failed SSH Logins</h2>
+<div class="bg-slate-900 text-slate-100 p-4 rounded-xl relative my-3">
+    <button onclick="copyCode(this)" class="absolute top-2.5 right-2.5 px-2 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700"><i class="fa-regular fa-copy"></i> Copy</button>
+    <pre><code># Search case-insensitively for failed password attempts
+grep -i "failed password" /var/log/auth.log
+
+# Count frequency of offending IP addresses
+grep "Failed password" /var/log/auth.log | awk '{print $11}' | sort | uniq -c | sort -nr</code></pre>
+</div>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white mt-4 mb-2">Common Grep Flags</h3>
+<ul class="list-disc pl-5 space-y-1 text-sm text-slate-600 dark:text-slate-300">
+    <li><code>-i</code>: Ignore case distinctions.</li>
+    <li><code>-r</code> or <code>-R</code>: Read all files under each directory recursively.</li>
+    <li><code>-n</code>: Prefix each line of output with line number.</li>
+    <li><code>-v</code>: Invert match (select non-matching lines).</li>
+</ul>`
+            },
+            {
+                id: "networking-basics",
+                category: "3. Networking & Recon",
+                title: "Network Diagnostics & Port Auditing",
+                content: `<p class="text-slate-600 dark:text-slate-300">Understanding listening ports, active socket connections, and host reachability allows admins and security analysts to audit services.</p>
+<h2 class="text-xl font-bold text-slate-900 dark:text-white mt-6 mb-3">Inspecting Open Sockets</h2>
+<div class="bg-slate-900 text-slate-100 p-4 rounded-xl relative my-3">
+    <button onclick="copyCode(this)" class="absolute top-2.5 right-2.5 px-2 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700"><i class="fa-regular fa-copy"></i> Copy</button>
+    <pre><code># Show TCP and UDP open sockets with Process IDs
+ss -tulnp
+
+# Test connectivity to a specific port
+nc -zv 192.168.1.1 22-80
+
+# Trace route packets to target host
+traceroute targethost.com</code></pre>
+</div>
+<div class="my-4 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border-l-4 border-emerald-500 text-emerald-900 dark:text-emerald-200 text-sm">
+    <strong class="font-bold flex items-center gap-1.5 mb-1"><i class="fa-solid fa-shield-halved"></i> Security Note:</strong>
+    Always ensure you have authorization before performing port scans or connection probes against remote infrastructure.
+</div>`
+            },
+            {
+                id: "bash-scripting-basics",
+                category: "4. Automation & Scripting",
+                title: "Writing Your First Incident Response Script",
+                content: `<p class="text-slate-600 dark:text-slate-300">Automating repetitive security checks with simple Bash scripts saves time and enforces consistency during triage.</p>
+<h2 class="text-xl font-bold text-slate-900 dark:text-white mt-6 mb-3">Quick System Triage Script Template</h2>
+<div class="bg-slate-900 text-slate-100 p-4 rounded-xl relative my-3">
+    <button onclick="copyCode(this)" class="absolute top-2.5 right-2.5 px-2 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700"><i class="fa-regular fa-copy"></i> Copy</button>
+    <pre><code>#!/bin/bash
+
+# Quick Triage Script
+echo "=== CURRENT LOGGED IN USERS ==="
+w
+
+echo "=== TOP CPU CONSUMING PROCESSES ==="
+ps aux --sort=-%cpu | head -n 6
+
+echo "=== LISTENING NETWORK PORTS ==="
+ss -tulpn | grep LISTEN</code></pre>
+</div>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white mt-4 mb-2">Making it Executable</h3>
+<div class="bg-slate-900 text-slate-100 p-4 rounded-xl relative my-3">
+    <button onclick="copyCode(this)" class="absolute top-2.5 right-2.5 px-2 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700"><i class="fa-regular fa-copy"></i> Copy</button>
+    <pre><code>chmod +x triage.sh
+./triage.sh</code></pre>
+</div>`
+            }
+        ];
+
+        let topics = [];
+        let currentTopicId = null;
+        let editingSubtopicId = null;
+        let collapsedCategories = {};
+
+        function initData() {
+            const stored = localStorage.getItem('cyber_docs_data');
+            if (stored) {
+                try {
+                    topics = JSON.parse(stored);
+                } catch(e) {
+                    topics = [...DEFAULT_TOPICS];
+                }
+            } else {
+                topics = [...DEFAULT_TOPICS];
+            }
+
+            const storedCollapsed = localStorage.getItem('cyber_docs_collapsed');
+            if (storedCollapsed) {
+                try {
+                    collapsedCategories = JSON.parse(storedCollapsed);
+                } catch(e) {
+                    collapsedCategories = {};
+                }
+            }
+            saveData();
+        }
+
+        function saveData() {
+            localStorage.setItem('cyber_docs_data', JSON.stringify(topics));
+            localStorage.setItem('cyber_docs_collapsed', JSON.stringify(collapsedCategories));
+            updateCategoryDatalist();
+            renderNavigation(headerSearchInput.value || mobileSearchInput.value);
+            updateTopicCount();
+        }
+
+        function toggleCategoryCollapse(categoryName) {
+            collapsedCategories[categoryName] = !collapsedCategories[categoryName];
+            saveData();
+        }
+
+        // DOM Elements
+        const navigationList = document.getElementById('navigationList');
+        const viewMode = document.getElementById('viewMode');
+        const editMode = document.getElementById('editMode');
+        const displayCategory = document.getElementById('displayCategory');
+        const displayTitle = document.getElementById('displayTitle');
+        const displayContent = document.getElementById('displayContent');
+        const tocList = document.getElementById('tocList');
+        
+        const editTitle = document.getElementById('editTitle');
+        const editCategory = document.getElementById('editCategory');
+        const editContent = document.getElementById('editContent');
+        const headerSearchInput = document.getElementById('headerSearchInput');
+        const mobileSearchInput = document.getElementById('mobileSearchInput');
+
+        function renderNavigation(searchTerm = '') {
+            navigationList.innerHTML = '';
+
+            const term = searchTerm.toLowerCase().trim();
+            const filteredTopics = topics.filter(t => 
+                t.title.toLowerCase().includes(term) || 
+                t.category.toLowerCase().includes(term) ||
+                t.content.toLowerCase().includes(term)
+            );
+
+            if (filteredTopics.length === 0) {
+                navigationList.innerHTML = `<p class="text-xs text-slate-400 p-2">No matching topics found.</p>`;
+                return;
+            }
+
+            // Group by category
+            const categoryMap = new Map();
+            topics.forEach((topic, index) => {
+                if (filteredTopics.includes(topic)) {
+                    if (!categoryMap.has(topic.category)) {
+                        categoryMap.set(topic.category, []);
+                    }
+                    categoryMap.get(topic.category).push({ topic, originalIndex: index });
+                }
+            });
+
+            categoryMap.forEach((items, categoryName) => {
+                const group = document.createElement('div');
+                group.className = 'space-y-1 bg-slate-50/50 dark:bg-slate-900/40 p-2 rounded-xl border border-slate-200/60 dark:border-slate-800/60';
+
+                const isCollapsed = !!collapsedCategories[categoryName] && term === '';
+
+                // Category Header Block
+                const header = document.createElement('div');
+                header.className = 'group flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-1 py-1 rounded hover:bg-slate-200/50 dark:hover:bg-slate-800/50 cursor-pointer';
+
+                const safeCat = categoryName.replace(/'/g, "\\'");
+                header.innerHTML = `
+                    <div onclick="toggleCategoryCollapse('${safeCat}')" class="flex items-center gap-1.5 flex-1 min-w-0 pr-1">
+                        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform ${isCollapsed ? '-rotate-90' : ''}"></i>
+                        <span class="truncate">${categoryName}</span>
+                    </div>
+                    <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100" onclick="event.stopPropagation()">
+                        <button onclick="addTopicToCategory('${safeCat}')" title="Add Subtopic to ${categoryName}" class="p-1 hover:text-emerald-500"><i class="fa-solid fa-plus text-[10px]"></i></button>
+                        <button onclick="renameCategoryPrompt('${safeCat}')" title="Rename Category" class="p-1 hover:text-blue-500"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                        <button onclick="deleteCategoryPrompt('${safeCat}')" title="Delete Category" class="p-1 hover:text-rose-500"><i class="fa-solid fa-trash text-[10px]"></i></button>
+                    </div>
+                `;
+                group.appendChild(header);
+
+                // Subtopic Items
+                if (!isCollapsed) {
+                    items.forEach(({ topic }) => {
+                        const subtopicWrapper = document.createElement('div');
+                        subtopicWrapper.className = 'group/item flex items-center justify-between rounded-lg transition-all';
+
+                        if (editingSubtopicId === topic.id) {
+                            // Inline Edit Mode for Subtopic Header
+                            subtopicWrapper.className += ' p-1 bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-700';
+                            subtopicWrapper.innerHTML = `
+                                <input type="text" id="inlineEditInput-${topic.id}" value="${topic.title.replace(/"/g, '&quot;')}" class="w-full text-xs bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-2 py-1 text-slate-800 dark:text-slate-100 focus:outline-none">
+                                <button onclick="saveInlineSubtopicTitle('${topic.id}')" class="ml-1 px-2 py-1 bg-emerald-600 text-white text-[10px] rounded hover:bg-emerald-700"><i class="fa-solid fa-check"></i></button>
+                                <button onclick="cancelInlineEdit()" class="ml-0.5 px-2 py-1 bg-slate-300 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-[10px] rounded"><i class="fa-solid fa-xmark"></i></button>
+                            `;
+                        } else {
+                            // Normal View Mode for Subtopic
+                            const isActive = topic.id === currentTopicId;
+                            const btn = document.createElement('button');
+                            btn.className = `flex-1 text-left px-2.5 py-1.5 text-xs rounded-md font-medium transition-all flex items-center gap-2 ${
+                                isActive 
+                                ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-semibold' 
+                                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800/60'
+                            }`;
+                            btn.innerHTML = `<i class="fa-solid fa-file-lines text-[10px] ${isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}"></i> <span class="truncate">${topic.title}</span>`;
+                            btn.onclick = () => selectTopic(topic.id);
+
+                            const controls = document.createElement('div');
+                            controls.className = 'hidden group-hover/item:flex items-center gap-0.5 pr-1 text-slate-400';
+                            controls.innerHTML = `
+                                <button onclick="moveTopic('${topic.id}', -1)" title="Move Up" class="p-1 hover:text-slate-700 dark:hover:text-slate-200"><i class="fa-solid fa-chevron-up text-[10px]"></i></button>
+                                <button onclick="moveTopic('${topic.id}', 1)" title="Move Down" class="p-1 hover:text-slate-700 dark:hover:text-slate-200"><i class="fa-solid fa-chevron-down text-[10px]"></i></button>
+                                <button onclick="startInlineSubtopicEdit('${topic.id}')" title="Rename Subtopic" class="p-1 hover:text-emerald-500"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                                <button onclick="quickDeleteTopic('${topic.id}')" title="Delete Subtopic" class="p-1 hover:text-rose-500"><i class="fa-solid fa-trash-can text-[10px]"></i></button>
+                            `;
+
+                            subtopicWrapper.appendChild(btn);
+                            subtopicWrapper.appendChild(controls);
+                        }
+
+                        group.appendChild(subtopicWrapper);
+                    });
+                }
+
+                navigationList.appendChild(group);
+            });
+        }
+
+        function startInlineSubtopicEdit(id) {
+            editingSubtopicId = id;
+            renderNavigation(headerSearchInput.value || mobileSearchInput.value);
+            setTimeout(() => {
+                const input = document.getElementById(`inlineEditInput-${id}`);
+                if (input) input.focus();
+            }, 50);
+        }
+
+        function cancelInlineEdit() {
+            editingSubtopicId = null;
+            renderNavigation(headerSearchInput.value || mobileSearchInput.value);
+        }
+
+        function saveInlineSubtopicTitle(id) {
+            const input = document.getElementById(`inlineEditInput-${id}`);
+            if (!input) return;
+            const newTitle = input.value.trim();
+            if (newTitle) {
+                const topic = topics.find(t => t.id === id);
+                if (topic) {
+                    topic.title = newTitle;
+                    if (currentTopicId === id) {
+                        displayTitle.textContent = newTitle;
+                        editTitle.value = newTitle;
+                    }
+                    editingSubtopicId = null;
+                    saveData();
+                    showToast('Subtopic heading updated!');
+                }
+            }
+        }
+
+        function renameCategoryPrompt(oldCategory) {
+            const newName = prompt(`Rename category "${oldCategory}" to:`, oldCategory);
+            if (newName && newName.trim() !== '' && newName.trim() !== oldCategory) {
+                const updatedName = newName.trim();
+                topics.forEach(t => {
+                    if (t.category === oldCategory) {
+                        t.category = updatedName;
+                    }
+                });
+                if (collapsedCategories[oldCategory] !== undefined) {
+                    collapsedCategories[updatedName] = collapsedCategories[oldCategory];
+                    delete collapsedCategories[oldCategory];
+                }
+                if (displayCategory.textContent === oldCategory) {
+                    displayCategory.textContent = updatedName;
+                }
+                saveData();
+                showToast(`Category renamed to "${updatedName}"`);
+            }
+        }
+
+        function deleteCategoryPrompt(category) {
+            const topicCount = topics.filter(t => t.category === category).length;
+            if (confirm(`Delete category "${category}" and all its ${topicCount} subtopics?`)) {
+                topics = topics.filter(t => t.category !== category);
+                delete collapsedCategories[category];
+                saveData();
+                if (topics.length > 0) {
+                    selectTopic(topics[0].id);
+                }
+                showToast(`Category "${category}" deleted.`);
+            }
+        }
+
+        function addCategoryPrompt() {
+            const catName = prompt("Enter new category group name:");
+            if (catName && catName.trim() !== '') {
+                const category = catName.trim();
+                const newId = 'topic-' + Date.now();
+                const newTopic = {
+                    id: newId,
+                    category: category,
+                    title: `New Subtopic under ${category}`,
+                    content: `<p class="text-slate-600 dark:text-slate-300">Add your documentation content here.</p>`
+                };
+                topics.push(newTopic);
+                collapsedCategories[category] = false;
+                saveData();
+                selectTopic(newId);
+                showToast(`Category "${category}" created!`);
+            }
+        }
+
+        function addTopicToCategory(category) {
+            const newId = 'topic-' + Date.now();
+            const newTopic = {
+                id: newId,
+                category: category,
+                title: "New Subtopic",
+                content: `<p class="text-slate-600 dark:text-slate-300">New subtopic body description...</p>`
+            };
+            topics.push(newTopic);
+            collapsedCategories[category] = false;
+            saveData();
+            selectTopic(newId);
+            startInlineSubtopicEdit(newId);
+        }
+
+        function moveTopic(id, direction) {
+            const index = topics.findIndex(t => t.id === id);
+            if (index < 0) return;
+            const newIndex = index + direction;
+            if (newIndex >= 0 && newIndex < topics.length) {
+                const temp = topics[index];
+                topics[index] = topics[newIndex];
+                topics[newIndex] = temp;
+                saveData();
+            }
+        }
+
+        function quickDeleteTopic(id) {
+            if (topics.length <= 1) {
+                showToast('Cannot delete the last remaining subtopic.', true);
+                return;
+            }
+            topics = topics.filter(t => t.id !== id);
+            saveData();
+            if (currentTopicId === id) {
+                selectTopic(topics[0].id);
+            }
+            showToast('Subtopic deleted.');
+        }
+
+        function selectTopic(id) {
+            const topic = topics.find(t => t.id === id);
+            if (!topic) return;
+
+            currentTopicId = id;
+            displayCategory.textContent = topic.category;
+            displayTitle.textContent = topic.title;
+            displayContent.innerHTML = topic.content;
+
+            // Ensure category of selected topic is expanded
+            if (collapsedCategories[topic.category]) {
+                collapsedCategories[topic.category] = false;
+            }
+
+            // Hide edit form if open
+            editMode.classList.add('hidden');
+            viewMode.classList.remove('hidden');
+
+            renderNavigation(headerSearchInput.value || mobileSearchInput.value);
+            generateTOC();
+            closeMobileMenu();
+        }
+
+        function generateTOC() {
+            tocList.innerHTML = '';
+            const headings = displayContent.querySelectorAll('h2, h3');
+            if (headings.length === 0) {
+                tocList.innerHTML = '<li class="italic text-slate-400">No section headings</li>';
+                return;
+            }
+
+            headings.forEach((h, idx) => {
+                if (!h.id) h.id = 'heading-' + idx;
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = '#' + h.id;
+                a.textContent = h.textContent;
+                a.className = `hover:text-emerald-600 dark:hover:text-emerald-400 block truncate ${h.tagName === 'H3' ? 'pl-2 text-[11px]' : ''}`;
+                li.appendChild(a);
+                tocList.appendChild(li);
+            });
+        }
+
+        function openEditMode() {
+            const topic = topics.find(t => t.id === currentTopicId);
+            if (!topic) return;
+
+            editTitle.value = topic.title;
+            editCategory.value = topic.category;
+            editContent.value = topic.content;
+
+            viewMode.classList.add('hidden');
+            editMode.classList.remove('hidden');
+        }
+
+        function saveEdits() {
+            const topic = topics.find(t => t.id === currentTopicId);
+            if (!topic) return;
+
+            topic.title = editTitle.value.trim() || 'Untitled Topic';
+            topic.category = editCategory.value.trim() || 'General';
+            topic.content = editContent.value;
+
+            saveData();
+            selectTopic(topic.id);
+            showToast('Changes saved successfully!');
+        }
+
+        function createNewTopic() {
+            const newId = 'topic-' + Date.now();
+            const newTopic = {
+                id: newId,
+                category: "Custom Topics",
+                title: "New Custom Topic",
+                content: `<p class="text-slate-600 dark:text-slate-300">Click the "Edit Page" button above to customize this page's text and code snippets.</p>
+<h2 class="text-xl font-bold text-slate-900 dark:text-white mt-6 mb-3">Example Header</h2>
+<div class="bg-slate-900 text-slate-100 p-4 rounded-xl relative my-3">
+    <button onclick="copyCode(this)" class="absolute top-2.5 right-2.5 px-2 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700"><i class="fa-regular fa-copy"></i> Copy</button>
+    <pre><code># Insert your shell command here
+echo "Hello World"</code></pre>
+</div>`
+            };
+            topics.push(newTopic);
+            collapsedCategories["Custom Topics"] = false;
+            saveData();
+            selectTopic(newId);
+            openEditMode();
+            showToast('New topic created!');
+        }
+
+        function duplicateTopic() {
+            const topic = topics.find(t => t.id === currentTopicId);
+            if (!topic) return;
+
+            const dupId = 'topic-' + Date.now();
+            const dupTopic = {
+                ...topic,
+                id: dupId,
+                title: topic.title + ' (Copy)'
+            };
+            topics.push(dupTopic);
+            saveData();
+            selectTopic(dupId);
+            showToast('Topic duplicated!');
+        }
+
+        function deleteTopic() {
+            if (topics.length <= 1) {
+                showToast('Cannot delete the last remaining topic.', true);
+                return;
+            }
+
+            if (confirm('Are you sure you want to delete this topic?')) {
+                topics = topics.filter(t => t.id !== currentTopicId);
+                saveData();
+                selectTopic(topics[0].id);
+                showToast('Topic deleted.');
+            }
+        }
+
+        function insertFormatting(type) {
+            const area = editContent;
+            const start = area.selectionStart;
+            const end = area.selectionEnd;
+            const text = area.value;
+
+            let snippet = '';
+            if (type === 'h2') snippet = `<h2 class="text-xl font-bold text-slate-900 dark:text-white mt-6 mb-3">Heading 2</h2>\n`;
+            if (type === 'h3') snippet = `<h3 class="text-lg font-bold text-slate-900 dark:text-white mt-4 mb-2">Heading 3</h3>\n`;
+            if (type === 'bold') snippet = `<strong>Bold Text</strong>`;
+            if (type === 'ul') snippet = `<ul class="list-disc pl-5 space-y-1 text-sm text-slate-600 dark:text-slate-300">\n  <li>Item 1</li>\n  <li>Item 2</li>\n</ul>\n`;
+            if (type === 'code') snippet = `<div class="bg-slate-900 text-slate-100 p-4 rounded-xl relative my-3">\n  <button onclick="copyCode(this)" class="absolute top-2.5 right-2.5 px-2 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700"><i class="fa-regular fa-copy"></i> Copy</button>\n  <pre><code># Add command here</code></pre>\n</div>\n`;
+            if (type === 'callout') snippet = `<div class="my-4 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border-l-4 border-emerald-500 text-emerald-900 dark:text-emerald-200 text-sm">\n  <strong class="font-bold flex items-center gap-1.5 mb-1"><i class="fa-solid fa-lightbulb"></i> Tip:</strong>\n  Add helpful tip here.\n</div>\n`;
+
+            area.value = text.substring(0, start) + snippet + text.substring(end);
+            area.focus();
+        }
+
+        function updateCategoryDatalist() {
+            const datalist = document.getElementById('categoryOptions');
+            datalist.innerHTML = '';
+            const cats = [...new Set(topics.map(t => t.category))];
+            cats.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                datalist.appendChild(opt);
+            });
+        }
+
+        function updateTopicCount() {
+            document.getElementById('topicCount').textContent = `${topics.length} topics total`;
+        }
+
+        function exportJSON() {
+            const blob = new Blob([JSON.stringify(topics, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cyber_docs_backup_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Exported backup file.');
+        }
+
+        function importJSON(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const imported = JSON.parse(evt.target.result);
+                    if (Array.isArray(imported) && imported.length > 0 && imported[0].id) {
+                        topics = imported;
+                        saveData();
+                        selectTopic(topics[0].id);
+                        showToast('Backup restored successfully!');
+                    } else {
+                        showToast('Invalid backup file format.', true);
+                    }
+                } catch(err) {
+                    showToast('Failed to parse JSON file.', true);
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        }
+
+        function resetToDefaults() {
+            if (confirm('Reset all documentation back to initial starter topics? Any custom edits will be lost.')) {
+                topics = [...DEFAULT_TOPICS];
+                collapsedCategories = {};
+                saveData();
+                selectTopic(topics[0].id);
+                showToast('Reset to default topics.');
+            }
+        }
+
+        function copyCode(btn) {
+            const pre = btn.parentElement.querySelector('pre');
+            if (pre) {
+                const codeText = pre.innerText;
+                navigator.clipboard.writeText(codeText).then(() => {
+                    const orig = btn.innerHTML;
+                    btn.innerHTML = `<i class="fa-solid fa-check text-emerald-400"></i> Copied!`;
+                    setTimeout(() => btn.innerHTML = orig, 1800);
+                });
+            }
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMsg.textContent = msg;
+            toastIcon.className = isError 
+                ? 'fa-solid fa-circle-exclamation text-rose-400' 
+                : 'fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600';
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Mobile Sidebar Controls
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+
+        function openMobileMenu() {
+            sidebar.classList.remove('-translate-x-full');
+            mobileOverlay.classList.remove('hidden');
+        }
+
+        function closeMobileMenu() {
+            sidebar.classList.add('-translate-x-full');
+            mobileOverlay.classList.add('hidden');
+        }
+
+        mobileMenuBtn.onclick = openMobileMenu;
+        mobileOverlay.onclick = closeMobileMenu;
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.onclick = () => {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        };
+
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // Attach Event Listeners
+        document.getElementById('addCategoryBtn').onclick = addCategoryPrompt;
+        document.getElementById('addTopicBtn').onclick = createNewTopic;
+        document.getElementById('toggleEditBtn').onclick = openEditMode;
+        document.getElementById('cancelEditBtn').onclick = () => {
+            editMode.classList.add('hidden');
+            viewMode.classList.remove('hidden');
+        };
+        document.getElementById('saveEditBtn').onclick = saveEdits;
+        document.getElementById('duplicateTopicBtn').onclick = duplicateTopic;
+        document.getElementById('deleteTopicBtn').onclick = deleteTopic;
+        document.getElementById('exportBtn').onclick = exportJSON;
+        document.getElementById('importFile').onchange = importJSON;
+        document.getElementById('resetDataBtn').onclick = resetToDefaults;
+
+        // Sync Search
+        headerSearchInput.oninput = (e) => {
+            mobileSearchInput.value = e.target.value;
+            renderNavigation(e.target.value);
+        };
+        mobileSearchInput.oninput = (e) => {
+            headerSearchInput.value = e.target.value;
+            renderNavigation(e.target.value);
+        };
+
+        // On Load Initializer
+        window.onload = () => {
+            initData();
+            if (topics.length > 0) {
+                selectTopic(topics[0].id);
+            }
+        };
+    </script>
+</body>
+</html>
